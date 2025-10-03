@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Festa Surpresa</title>
+<style>
+  body {
+    margin:0;
+    height:100vh;
+    background: linear-gradient(135deg,#fff5e6,#ffebff);
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    overflow:hidden;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+  }
+
+  .container {
+    text-align:center;
+    background: rgba(255,255,255,0.8);
+    padding:50px 60px;
+    border-radius:30px;
+    box-shadow:0 8px 30px rgba(0,0,0,0.2);
+    position:relative;
+    transition: transform 0.2s;
+  }
+
+  .container:hover { transform: scale(1.05); }
+
+  h1 {
+    font-size:3rem;
+    color:#ff69b4;
+    margin-bottom:20px;
+    animation: bounce 1s infinite alternate;
+  }
+
+  @keyframes bounce { 0% { transform: translateY(0); } 100% { transform: translateY(-10px); } }
+
+  .balloon {
+    width:80px;
+    height:100px;
+    display:inline-block;
+    margin:10px;
+    background: radial-gradient(circle at 50% 30%, #ff6ec7,#ffb347);
+    border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
+    position: relative;
+    animation: floatBalloon 3s infinite alternate ease-in-out;
+  }
+
+  .balloon::after {
+    content:'';
+    position:absolute;
+    bottom:-20px;
+    left:50%;
+    width:2px;
+    height:20px;
+    background:#555;
+    transform:translateX(-50%);
+  }
+
+  @keyframes floatBalloon { 0%{transform:translateY(0)}100%{transform:translateY(-15px)} }
+
+  button {
+    padding:16px 32px;
+    font-size:1.3rem;
+    border:none;
+    border-radius:25px;
+    background: linear-gradient(90deg,#ff9a9e,#fad0c4);
+    color:#fff;
+    cursor:pointer;
+    box-shadow:0 6px 20px rgba(0,0,0,0.25);
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-top:30px;
+    font-weight:bold;
+  }
+
+  button:hover { transform: scale(1.1); box-shadow:0 10px 25px rgba(0,0,0,0.3); }
+
+  /* confete */
+  .confetti {
+    position:fixed;
+    pointer-events:none;
+    z-index:40;
+    width:10px;
+    height:10px;
+    border-radius:50%;
+  }
+
+  /* modal escondido */
+  .overlay {
+    position:fixed;
+    inset:0;
+    background: rgba(0,0,0,0.75);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:50;
+  }
+
+  .modal {
+    background:#fff;
+    padding:20px;
+    border-radius:25px;
+    max-width:400px;
+    text-align:center;
+    position:relative;
+    box-shadow:0 10px 40px rgba(0,0,0,0.4);
+    animation: pop 0.3s ease;
+  }
+
+  @keyframes pop { 0% { transform: scale(0.5); opacity:0; } 100% { transform: scale(1); opacity:1; } }
+
+  .modal img { max-width:100%; border-radius:15px; }
+
+  .close {
+    position:absolute;
+    top:10px;
+    right:10px;
+    background:transparent;
+    border:none;
+    font-size:1.3rem;
+    cursor:pointer;
+  }
+
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎉 Feliz Aniversário! 🎉</h1>
+    <div class="balloon"></div>
+    <div class="balloon"></div>
+    <div class="balloon"></div>
+    <div class="balloon"></div>
+    <button id="surpriseBtn">Abrir Presente!</button>
+  </div>
+
+<script>
+  const btn = document.getElementById('surpriseBtn');
+
+  // gera confete colorido
+  function spawnConfetti(){
+    const colors = ['#ff6ec7','#ffb347','#6a0dad','#00bfff','#ff69b4','#fff700'];
+    for(let i=0;i<40;i++){
+      const c = document.createElement('div');
+      c.className='confetti';
+      c.style.left = Math.random()*window.innerWidth+'px';
+      c.style.top = Math.random()*window.innerHeight+'px';
+      const size = 5 + Math.random()*10;
+      c.style.width = c.style.height = size+'px';
+      c.style.background = colors[Math.floor(Math.random()*colors.length)];
+      document.body.appendChild(c);
+      const dx = (Math.random()-0.5)*400;
+      const dy = Math.random()*400 + 100;
+      const dur = 1000 + Math.random()*2000;
+      animateParticle(c, dx, dy, dur);
+    }
+  }
+
+  function animateParticle(el, dx, dy, dur){
+    const start = performance.now();
+    const ox = parseFloat(el.style.left);
+    const oy = parseFloat(el.style.top);
+    function frame(now){
+      const t = Math.min(1,(now-start)/dur);
+      el.style.left = (ox + dx*t) + 'px';
+      el.style.top = (oy + dy*t) + 'px';
+      el.style.opacity = String(1-t);
+      if(t < 1) requestAnimationFrame(frame); else el.remove();
+    }
+    requestAnimationFrame(frame);
+  }
+
+  btn.addEventListener('click', ()=>{
+    spawnConfetti(); // confete festa
+
+    // modal surpresa do meme
+    const overlay = document.createElement('div');
+    overlay.className = 'overlay';
+
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+
+    const close = document.createElement('button');
+    close.className = 'close';
+    close.textContent = '✖';
+    close.addEventListener('click', ()=>overlay.remove());
+
+    const img = document.createElement('img');
+    img.src = 'images.jpg'; // meme do macaco
+    img.alt = 'Meme do Macaco Surpresa';
+
+    modal.appendChild(close);
+    modal.appendChild(img);
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+  });
+</script>
+</body>
+</html>
